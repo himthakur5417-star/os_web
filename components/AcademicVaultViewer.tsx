@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import Link from "next/link";
 import {
   BookOpen,
   Search,
@@ -448,6 +449,7 @@ const TAB_INFO: Record<VaultTab, { eyebrow: string; title: string; subtitle: str
           </div>
         )}
       </div>
+
 
       {activeTab === "nda-maths" && (
         <SubjectPurchasePanel

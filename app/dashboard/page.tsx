@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import {
   Shield,
@@ -49,6 +49,18 @@ interface EntitlementSummary {
   expired: boolean;
   purchasedAt: string | null;
   expiresAt: string | null;
+}
+
+interface StudentUpiOrderSummary {
+  orderNo: string;
+  subjectId: "nda-mathematics" | "cds-mathematics" | "nda-cds-english";
+  subjectTitle: string;
+  amountPaise: number;
+  currency: string;
+  status: "pending" | "review" | "paid" | "expired";
+  customerUtr: string | null;
+  utr: string | null;
+  createdAt: string;
 }
 
 type EntitlementsMap = Record<string, EntitlementSummary>;
@@ -133,6 +145,7 @@ export default function StudentDashboardPage() {
   const [isDevPreview, setIsDevPreview] = useState(false);
   const [student, setStudent] = useState<StudentProfile | null>(null);
   const [entitlements, setEntitlements] = useState<EntitlementsMap | null>(null);
+  const [upiOrders, setUpiOrders] = useState<StudentUpiOrderSummary[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -146,13 +159,20 @@ export default function StudentDashboardPage() {
     }
   }, []);
 
-  const effectiveUser = user || (isDevPreview ? {
-    uid: "test_cadet_uid_8412",
-    email: "cadet.vikram@officiumsupremum.in",
-    displayName: "Cadet Vikram Sharma",
-    role: "user" as const,
-    rollNumber: "OS-USR-8412",
-  } : null);
+  const effectiveUser = useMemo(
+    () =>
+      user ||
+      (isDevPreview
+        ? {
+            uid: "test_cadet_uid_8412",
+            email: "cadet.vikram@officiumsupremum.in",
+            displayName: "Cadet Vikram Sharma",
+            role: "user" as const,
+            rollNumber: "OS-USR-8412",
+          }
+        : null),
+    [isDevPreview, user]
+  );
 
   // Profile Edit State
   const [isEditing, setIsEditing] = useState(false);
@@ -238,11 +258,18 @@ export default function StudentDashboardPage() {
           headers.Authorization = `Bearer ${token}`;
         }
 
-        const res = await fetch("/api/student/dashboard", {
-          method: "GET",
-          headers,
-          cache: "no-store",
-        });
+        const [res, ordersRes] = await Promise.all([
+          fetch("/api/student/dashboard", {
+            method: "GET",
+            headers,
+            cache: "no-store",
+          }),
+          fetch("/api/upi/orders", {
+            method: "GET",
+            headers,
+            cache: "no-store",
+          }).catch(() => null),
+        ]);
 
         if (res.status === 401) {
           setFetchError("Your session has expired. Please sign in again.");
@@ -263,6 +290,10 @@ export default function StudentDashboardPage() {
         }
         if (data.entitlements) {
           setEntitlements(data.entitlements);
+        }
+        if (ordersRes && ordersRes.ok) {
+          const ordersData = await ordersRes.json().catch(() => ({}));
+          setUpiOrders(Array.isArray(ordersData?.orders) ? ordersData.orders : []);
         }
       } catch (err: any) {
         console.error("Dashboard data load error:", err);
@@ -815,13 +846,15 @@ export default function StudentDashboardPage() {
                 My Study Vault &amp; Modules
               </h2>
             </div>
-            <Link
-              href="/resources"
-              className="text-xs font-sans uppercase tracking-wider uppercase tracking-wider text-[#252923] hover:text-[#252923] flex items-center gap-1.5 transition-colors self-start sm:self-auto"
-            >
-              <span>Explore All Academic Resources</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
-            </Link>
+            <div className="flex flex-wrap items-center gap-3 self-start sm:self-auto">
+              <Link
+                href="/resources"
+                className="text-xs font-sans uppercase tracking-wider text-[#252923] hover:text-[#34483C] flex items-center gap-1.5 transition-colors"
+              >
+                <span>All Resources</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1089,6 +1122,69 @@ export default function StudentDashboardPage() {
               </div>
             )}
           </div>
+
+          {upiOrders.length > 0 && (
+            <div className="p-6 sm:p-8 rounded-2xl bg-white border border-[#D8D5C8] shadow-xl space-y-4">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="font-heading font-medium text-xl text-[#252923]">
+                  Recent Direct UPI Transactions
+                </h3>
+                <span className="text-[11px] font-mono text-[#252923]/60">
+                  {upiOrders.length} order{upiOrders.length === 1 ? "" : "s"}
+                </span>
+              </div>
+
+              <div className="divide-y divide-[#D8D5C8]">
+                {upiOrders.slice(0, 6).map((ord) => (
+                  <div
+                    key={ord.orderNo}
+                    className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-sans"
+                  >
+                    <div className="space-y-0.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-mono font-bold text-[#252923]">{ord.orderNo}</span>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            ord.status === "paid"
+                              ? "bg-emerald-100 text-emerald-800"
+                              : ord.status === "review"
+                              ? "bg-amber-100 text-amber-900"
+                              : ord.status === "pending"
+                              ? "bg-sky-100 text-sky-800"
+                              : "bg-slate-100 text-slate-600"
+                          }`}
+                        >
+                          {ord.status === "review" ? "Verifying UTR" : ord.status}
+                        </span>
+                      </div>
+                      <div className="text-[#252923]/75">
+                        {ord.subjectTitle} · ₹{(ord.amountPaise / 100).toFixed(2)}
+                        {(ord.utr || ord.customerUtr) ? (
+                          <span className="ml-2 font-mono text-[11px] text-[#252923]">
+                            UTR: {ord.utr || ord.customerUtr}
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
+
+                    <Link
+                      href={`/pay/${ord.orderNo}`}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#F3EFE6] hover:bg-[#34483C] hover:text-[#F3EFE6] border border-[#D8D5C8] text-[#252923] font-semibold transition-colors self-start sm:self-auto"
+                    >
+                      <span>
+                        {ord.status === "pending"
+                          ? "Complete UPI Payment"
+                          : ord.status === "review"
+                          ? "Track Verification"
+                          : "View Order"}
+                      </span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
 
         {/* ========================================================================= */}
