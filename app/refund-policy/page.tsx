@@ -221,7 +221,7 @@ export default function RefundPolicyPage() {
                 <strong>Review Window:</strong> Once received, your request will be reviewed and acknowledged within 24 to 48 business hours.
               </li>
               <li>
-                <strong>Payment Method:</strong> Approved refunds are credited directly back to the original source account (UPI, Net Banking, Debit Card, or Credit Card via our payment gateway). We do not issue cash refunds or third-party transfers.
+                <strong>Payment Method:</strong> Approved refunds are credited directly back to the original UPI source account verified with your transaction UTR. We do not issue cash refunds or unverified third-party transfers.
               </li>
               <li>
                 <strong>Bank Settlement:</strong> After we initiate the refund, funds typically appear in your bank account or card statement within <span className="font-semibold text-[#34483C]">5 to 7 business days</span>, in accordance with Reserve Bank of India (RBI) and card network operating standards.

@@ -11,6 +11,7 @@ import {
   updateProfile,
   signInWithPopup,
   signOut as firebaseSignOut,
+  sendPasswordResetEmail,
   onAuthStateChanged,
   type User as FirebaseUser
 } from "@/lib/firebase";
@@ -36,6 +37,7 @@ interface AuthContextType {
   closeAuthModal: () => void;
   signInEmail: (email: string, pass: string) => Promise<{ role: string; redirectTo: string }>;
   signUpEmail: (email: string, pass: string, name: string) => Promise<{ role: string; redirectTo: string }>;
+  resetPassword: (email: string) => Promise<void>;
   signInGoogle: () => Promise<void>;
   loginDemo: (role?: "cadet" | "scholar" | "parent") => void;
   logout: (redirectTo?: string | unknown) => Promise<void>;
@@ -643,6 +645,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const resetPassword = async (email: string) => {
+    const cleanEmail = String(email || "").trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes("@")) {
+      throw new Error("Please enter a valid email address to receive password reset instructions.");
+    }
+    const firebaseAuth = auth || getFirebaseAuth();
+    if (!firebaseAuth) {
+      throw new Error("Authentication service is not available. Please refresh the page.");
+    }
+    try {
+      await sendPasswordResetEmail(firebaseAuth, cleanEmail);
+    } catch (err: any) {
+      const code = String(err?.code || "");
+      if (code === "auth/user-not-found") {
+        throw new Error("No account found with this email. Please check your spelling or create an account.");
+      }
+      throw new Error(err?.message || "Failed to send password reset email. Please try again.");
+    }
+  };
+
   const signInGoogle = async () => {
     if (isGoogleSigningInRef.current) return;
     const firebaseAuth = auth || getFirebaseAuth();
@@ -763,6 +785,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         closeAuthModal,
         signInEmail,
         signUpEmail,
+        resetPassword,
         signInGoogle,
         loginDemo,
         logout,

@@ -11,6 +11,7 @@ import {
   setPersistence,
   GoogleAuthProvider,
   signOut,
+  sendPasswordResetEmail,
   onAuthStateChanged,
   type Auth,
   type User
@@ -118,6 +119,7 @@ export {
   signInWithRedirect,
   getRedirectResult,
   signOut,
+  sendPasswordResetEmail,
   onAuthStateChanged,
   type Auth,
   type User

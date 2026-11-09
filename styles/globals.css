@@ -460,6 +460,17 @@ body {
 .perspective-1000 {
   perspective: 1000px;
 }
+
+/* Modal dialog scroll containment and backdrop styling */
+dialog.os-modal-dialog:modal {
+  overscroll-behavior: contain;
+}
+dialog.os-modal-dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background-color: rgba(37, 41, 35, 0.65);
+  backdrop-filter: blur(4px);
+}
 .rotate-y-0 {
   transform: rotateY(0deg) !important;
 }

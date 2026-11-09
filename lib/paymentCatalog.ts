@@ -1,5 +1,5 @@
 export const PAYMENT_ACCESS_DAYS = 365;
-export const PAYMENT_CURRENCY = process.env.RAZORPAY_CURRENCY || "INR";
+export const PAYMENT_CURRENCY = process.env.UPI_CURRENCY || "INR";
 
 export type PaidSubjectId = "nda-mathematics" | "cds-mathematics" | "nda-cds-english";
 
@@ -14,19 +14,19 @@ export const PAID_SUBJECTS: readonly PaidSubjectConfig[] = [
   {
     id: "nda-mathematics",
     title: "NDA Mathematics",
-    amountEnv: "RAZORPAY_NDA_MATHEMATICS_AMOUNT_PAISE",
+    amountEnv: "UPI_NDA_MATHEMATICS_AMOUNT_PAISE",
     vaultRoot: "NDA mathematics",
   },
   {
     id: "cds-mathematics",
     title: "CDS Mathematics",
-    amountEnv: "RAZORPAY_CDS_MATHEMATICS_AMOUNT_PAISE",
+    amountEnv: "UPI_CDS_MATHEMATICS_AMOUNT_PAISE",
     vaultRoot: "CDS mathematics",
   },
   {
     id: "nda-cds-english",
     title: "NDA/CDS English",
-    amountEnv: "RAZORPAY_NDA_CDS_ENGLISH_AMOUNT_PAISE",
+    amountEnv: "UPI_NDA_CDS_ENGLISH_AMOUNT_PAISE",
     vaultRoot: "NDA CDS English",
   },
 ];

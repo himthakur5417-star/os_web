@@ -644,11 +644,10 @@ export default function UpiCheckoutView({
                       }
                     }}
                     placeholder="e.g. 412345678901"
-                    className={`w-full px-3 py-2.5 rounded-lg border font-mono text-base sm:text-sm tracking-wider text-[#252923] focus:outline-none transition-all ${
-                      isValidUtr
+                    className={`w-full px-3 py-2.5 rounded-lg border font-mono text-base sm:text-sm tracking-wider text-[#252923] focus:outline-none transition-all ${isValidUtr
                         ? "border-emerald-600 bg-emerald-50/50 ring-2 ring-emerald-500/20"
                         : "border-[#34483C]/25 bg-[#F3EFE6]/40 focus:ring-2 focus:ring-[#34483C]"
-                    }`}
+                      }`}
                   />
                   {isValidUtr && (
                     <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-emerald-600">
@@ -660,11 +659,10 @@ export default function UpiCheckoutView({
                 <button
                   type="submit"
                   disabled={submittingUtr}
-                  className={`px-4 py-2.5 rounded-lg text-xs font-label uppercase tracking-wider font-bold transition-all shrink-0 inline-flex items-center gap-1.5 ${
-                    isValidUtr
+                  className={`px-4 py-2.5 rounded-lg text-xs font-label uppercase tracking-wider font-bold transition-all shrink-0 inline-flex items-center gap-1.5 ${isValidUtr
                       ? "bg-[#B18A58] hover:bg-[#967243] text-white shadow-md shadow-[#B18A58]/30 scale-[1.02]"
                       : "bg-[#252923] hover:bg-[#34483C] text-[#F3EFE6]"
-                  } disabled:opacity-50`}
+                    } disabled:opacity-50`}
                 >
                   {submittingUtr ? (
                     <>
@@ -686,7 +684,7 @@ export default function UpiCheckoutView({
               {isValidUtr && (
                 <div className="flex items-center gap-1.5 text-[11px] text-emerald-700 font-semibold font-sans">
                   <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                  <span>12-digit UTR ready. Click "Submit UTR" to send for instant verification.</span>
+                  <span>12-digit UTR ready. Click &quot;Submit UTR&quot; to send for instant verification.</span>
                 </div>
               )}
 
@@ -700,33 +698,30 @@ export default function UpiCheckoutView({
                     <button
                       type="button"
                       onClick={() => setActiveAppGuide((prev) => (prev === "phonepe" ? null : "phonepe"))}
-                      className={`px-2 py-0.5 rounded text-[10.5px] font-semibold border transition-colors ${
-                        activeAppGuide === "phonepe"
+                      className={`px-2 py-0.5 rounded text-[10.5px] font-semibold border transition-colors ${activeAppGuide === "phonepe"
                           ? "bg-[#5f259f] text-white border-[#5f259f]"
                           : "bg-[#F3EFE6] text-[#5f259f] border-[#34483C]/15 hover:bg-[#5f259f]/10"
-                      }`}
+                        }`}
                     >
                       PhonePe
                     </button>
                     <button
                       type="button"
                       onClick={() => setActiveAppGuide((prev) => (prev === "gpay" ? null : "gpay"))}
-                      className={`px-2 py-0.5 rounded text-[10.5px] font-semibold border transition-colors ${
-                        activeAppGuide === "gpay"
+                      className={`px-2 py-0.5 rounded text-[10.5px] font-semibold border transition-colors ${activeAppGuide === "gpay"
                           ? "bg-[#1a73e8] text-white border-[#1a73e8]"
                           : "bg-[#F3EFE6] text-[#1a73e8] border-[#34483C]/15 hover:bg-[#1a73e8]/10"
-                      }`}
+                        }`}
                     >
                       GPay
                     </button>
                     <button
                       type="button"
                       onClick={() => setActiveAppGuide((prev) => (prev === "paytm" ? null : "paytm"))}
-                      className={`px-2 py-0.5 rounded text-[10.5px] font-semibold border transition-colors ${
-                        activeAppGuide === "paytm"
+                      className={`px-2 py-0.5 rounded text-[10.5px] font-semibold border transition-colors ${activeAppGuide === "paytm"
                           ? "bg-[#0099cc] text-white border-[#0099cc]"
                           : "bg-[#F3EFE6] text-[#0099cc] border-[#34483C]/15 hover:bg-[#0099cc]/10"
-                      }`}
+                        }`}
                     >
                       Paytm
                     </button>

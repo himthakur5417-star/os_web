@@ -5,6 +5,7 @@ export interface VerifiedPaymentUser {
   uid: string;
   email: string;
   provider?: string;
+  name?: string;
 }
 
 export async function getVerifiedPaymentUser(req: NextRequest): Promise<VerifiedPaymentUser | null> {
@@ -19,6 +20,7 @@ export async function getVerifiedPaymentUser(req: NextRequest): Promise<Verified
     uid: verified.uid,
     email: verified.email,
     provider: verified.provider,
+    name: verified.name,
   };
 }
 

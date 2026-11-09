@@ -69,6 +69,19 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Close dropdowns / menu on Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setProgramsDropdownOpen(false);
+        setUserDropdownOpen(false);
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -128,6 +141,7 @@ export function Navbar() {
     { href: "/contact", label: "Contact Us" },
   ];
 
+
   return (
     <>
       {/* Floating Centered Navigation Header Container */}
@@ -136,11 +150,10 @@ export function Navbar() {
         aria-label="Main Navigation"
       >
         <div
-          className={`pointer-events-auto rounded-full transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between border ${
-            scrolled
-              ? "bg-[#F3EFE6]/92 backdrop-blur-xl border-[#252923]/12 shadow-[0_8px_30px_rgb(37,41,35,0.08)]"
-              : "bg-[#F3EFE6]/80 backdrop-blur-md border-[#252923]/8 shadow-[0_4px_20px_rgb(37,41,35,0.04)]"
-          }`}
+          className={`pointer-events-auto rounded-full transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between border ${scrolled
+            ? "bg-[#F3EFE6]/92 backdrop-blur-xl border-[#252923]/12 shadow-[0_8px_30px_rgb(37,41,35,0.08)]"
+            : "bg-[#F3EFE6]/80 backdrop-blur-md border-[#252923]/8 shadow-[0_4px_20px_rgb(37,41,35,0.04)]"
+            }`}
         >
           {/* Brand Logo Lockup */}
           <Link
@@ -155,11 +168,10 @@ export function Navbar() {
           <nav className="hidden lg:flex items-center gap-6" aria-label="Desktop Navigation">
             <Link
               href="/"
-              className={`caption-1 tracking-wider uppercase transition-colors py-1 ${
-                pathname === "/"
+              className={`caption-1 tracking-wider uppercase transition-colors py-1 ${pathname === "/"
                   ? "text-[#34483C] font-semibold border-b-2 border-[#34483C] pb-0.5"
                   : "text-[#252923]/80 hover:text-[#34483C]"
-              }`}
+                }`}
             >
               Home
             </Link>
@@ -174,18 +186,16 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={() => setProgramsDropdownOpen(!programsDropdownOpen)}
-                className={`caption-1 tracking-wider uppercase flex items-center gap-1.5 transition-colors py-1 ${
-                  pathname.startsWith("/programs")
+                className={`caption-1 tracking-wider uppercase flex items-center gap-1.5 transition-colors py-1 ${pathname.startsWith("/programs")
                     ? "text-[#34483C] font-semibold border-b-2 border-[#34483C] pb-0.5"
                     : "text-[#252923]/80 hover:text-[#34483C]"
-                }`}
+                  }`}
                 aria-expanded={programsDropdownOpen}
               >
                 <span>Programs</span>
                 <CaretDown
-                  className={`w-3.5 h-3.5 opacity-70 transition-transform duration-200 ${
-                    programsDropdownOpen ? "rotate-180" : ""
-                  }`}
+                  className={`w-3.5 h-3.5 opacity-70 transition-transform duration-200 ${programsDropdownOpen ? "rotate-180" : ""
+                    }`}
                   weight="bold"
                 />
               </button>
@@ -241,33 +251,30 @@ export function Navbar() {
 
             <Link
               href="/resources"
-              className={`caption-1 tracking-wider uppercase transition-colors py-1 ${
-                pathname === "/resources"
+              className={`caption-1 tracking-wider uppercase transition-colors py-1 ${pathname === "/resources"
                   ? "text-[#34483C] font-semibold border-b-2 border-[#34483C] pb-0.5"
                   : "text-[#252923]/80 hover:text-[#34483C]"
-              }`}
+                }`}
             >
               Study Materials
             </Link>
 
             <Link
               href="/about"
-              className={`caption-1 tracking-wider uppercase transition-colors py-1 ${
-                pathname === "/about"
+              className={`caption-1 tracking-wider uppercase transition-colors py-1 ${pathname === "/about"
                   ? "text-[#34483C] font-semibold border-b-2 border-[#34483C] pb-0.5"
                   : "text-[#252923]/80 hover:text-[#34483C]"
-              }`}
+                }`}
             >
               About Us
             </Link>
 
             <Link
               href="/contact"
-              className={`caption-1 tracking-wider uppercase transition-colors py-1 ${
-                pathname === "/contact"
+              className={`caption-1 tracking-wider uppercase transition-colors py-1 ${pathname === "/contact"
                   ? "text-[#34483C] font-semibold border-b-2 border-[#34483C] pb-0.5"
                   : "text-[#252923]/80 hover:text-[#34483C]"
-              }`}
+                }`}
             >
               Contact Us
             </Link>
@@ -277,7 +284,16 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-3">
             {/* Authenticated State */}
             {user ? (
-              <div className="relative" ref={userDropdownRef}>
+              <div
+                className="relative"
+                ref={userDropdownRef}
+                onFocusCapture={() => setUserDropdownOpen(true)}
+                onBlurCapture={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                    setUserDropdownOpen(false);
+                  }
+                }}
+              >
                 <button
                   type="button"
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
@@ -339,7 +355,7 @@ export function Navbar() {
             ) : (
               <button
                 type="button"
-                onClick={() => openAuthModal("signin")}
+                onClick={() => openAuthModal("signin", "/dashboard")}
                 className="flex items-center gap-1.5 px-3.5 py-1.5 button-sm text-[#252923] hover:text-[#34483C] bg-white/70 hover:bg-white rounded-full border border-[#252923]/10 transition-colors shadow-sm"
               >
                 <SignIn className="w-3.5 h-3.5 text-[#34483C]" weight="bold" />
@@ -398,7 +414,7 @@ export function Navbar() {
           {/* Staggered Navigation Links */}
           <div className="space-y-6 pt-4">
             <div className="space-y-2">
-              <span className="caption-3 uppercase tracking-widest text-[#B18A58]">
+              <span className="caption-3 uppercase tracking-widest text-[#8A6538]">
                 Navigation
               </span>
               <ul className="space-y-4">
@@ -424,7 +440,7 @@ export function Navbar() {
 
             {/* Mobile Programs List */}
             <div className="space-y-2 pt-2">
-              <span className="caption-3 uppercase tracking-widest text-[#B18A58]">
+              <span className="caption-3 uppercase tracking-widest text-[#8A6538]">
                 Programs
               </span>
               <div className="grid grid-cols-1 gap-2.5">
@@ -488,7 +504,7 @@ export function Navbar() {
                 type="button"
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  openAuthModal("signin");
+                  openAuthModal("signin", "/dashboard");
                 }}
                 className="w-full py-3 text-center button-sm text-[#252923] bg-white rounded-full border border-[#252923]/15 shadow-sm"
               >

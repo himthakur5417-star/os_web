@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       role: "user",
-      redirectTo: "/",
+      redirectTo: "/dashboard",
       user: {
         uid: recordedUser.uid,
         email: recordedUser.email,

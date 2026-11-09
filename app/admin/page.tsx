@@ -33,8 +33,10 @@ import {
   Inbox,
   User as UserIcon,
   Activity,
-  ArrowUpRight
+  ArrowUpRight,
+  QrCode
 } from "lucide-react";
+import AdminUpiGatewayPanel, { type AdminUpiOverviewData } from "@/components/AdminUpiGatewayPanel";
 
 interface Enquiry {
   id: string;
@@ -113,6 +115,7 @@ export default function AdminDashboardPage() {
   const [tabLoading, setTabLoading] = useState(false);
   const [loadedTabs, setLoadedTabs] = useState<Record<string, boolean>>({
     enquiries: false,
+    upi: false,
     logins: false,
     users: false,
     traffic: false,
@@ -122,12 +125,13 @@ export default function AdminDashboardPage() {
   // Data states
   const [stats, setStats] = useState<Stats | null>(null);
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
+  const [upiOverview, setUpiOverview] = useState<AdminUpiOverviewData | null>(null);
   const [users, setUsers] = useState<UserAccount[]>([]);
   const [logs, setLogs] = useState<LoginLog[]>([]);
   const [trafficLogs, setTrafficLogs] = useState<TrafficLog[]>([]);
 
-  // Active Tab: "enquiries" | "logins" | "users" | "traffic" | "new-lead"
-  const [activeTab, setActiveTab] = useState<"enquiries" | "logins" | "users" | "traffic" | "new-lead">("enquiries");
+  // Active Tab: "enquiries" | "upi" | "logins" | "users" | "traffic" | "new-lead"
+  const [activeTab, setActiveTab] = useState<"enquiries" | "upi" | "logins" | "users" | "traffic" | "new-lead">("enquiries");
 
   // Search and Filter states
   const [enquirySearch, setEnquirySearch] = useState("");
@@ -186,10 +190,11 @@ export default function AdminDashboardPage() {
       // Session verified: Reveal admin shell immediately for progressive UX
       setLoading(false);
 
-      // 2. Concurrently fetch high-level stats and default active tab (enquiries)
-      const [statsRes, enqRes] = await Promise.all([
+      // 2. Concurrently fetch high-level stats, default active tab (enquiries), and UPI review queue badge
+      const [statsRes, enqRes, upiRes] = await Promise.all([
         fetch("/api/admin/stats", { headers: getAdminHeaders(), credentials: "include" }),
         fetch("/api/admin/enquiries", { headers: getAdminHeaders(), credentials: "include" }),
+        fetch("/api/admin/upi/overview", { headers: getAdminHeaders(), credentials: "include" }),
       ]);
       if (!isMountedRef.current) return;
 
@@ -207,6 +212,14 @@ export default function AdminDashboardPage() {
           setLoadedTabs((prev) => ({ ...prev, enquiries: true }));
         }
       }
+
+      if (upiRes.ok) {
+        const upiData = await upiRes.json();
+        if (isMountedRef.current) {
+          setUpiOverview(upiData);
+          setLoadedTabs((prev) => ({ ...prev, upi: true }));
+        }
+      }
     } catch (e) {
       if (isMountedRef.current) {
         router.push("/admin/login");
@@ -214,10 +227,35 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const reloadUpiOverview = async () => {
+    try {
+      const upiRes = await fetch("/api/admin/upi/overview", {
+        headers: getAdminHeaders(),
+        credentials: "include",
+      });
+      if (upiRes.ok && isMountedRef.current) {
+        const upiData = await upiRes.json();
+        setUpiOverview(upiData);
+        setLoadedTabs((prev) => ({ ...prev, upi: true }));
+      }
+    } catch (e) {
+      console.error("Failed to reload UPI overview:", e);
+    }
+  };
+
   const loadTabData = async (tab: string) => {
     if (inFlightTabLoadRef.current[tab]) return;
 
-    if (tab === "logins" && !loadedTabs.logins) {
+    if (tab === "upi" && !loadedTabs.upi) {
+      inFlightTabLoadRef.current[tab] = true;
+      setTabLoading(true);
+      try {
+        await reloadUpiOverview();
+      } finally {
+        inFlightTabLoadRef.current[tab] = false;
+        if (isMountedRef.current) setTabLoading(false);
+      }
+    } else if (tab === "logins" && !loadedTabs.logins) {
       inFlightTabLoadRef.current[tab] = true;
       setTabLoading(true);
       try {
@@ -302,11 +340,13 @@ export default function AdminDashboardPage() {
       }
 
       if (activeTab === "enquiries") {
-        const enqRes = await fetch("/api/admin/enquiries", { headers: getAdminHeaders() });
+        const enqRes = await fetch("/api/admin/enquiries", { headers: getAdminHeaders(), credentials: "include" });
         if (enqRes.ok) {
           const enqData = await enqRes.json();
           setEnquiries(enqData.enquiries || []);
         }
+      } else if (activeTab === "upi") {
+        await reloadUpiOverview();
       } else if (activeTab === "logins") {
         const logsRes = await fetch("/api/admin/logs?limit=100", { headers: getAdminHeaders() });
         if (logsRes.ok) {
@@ -790,6 +830,25 @@ export default function AdminDashboardPage() {
           </div>
         </section>
 
+        {/* Action Alert for Pending UPI UTR Reviews */}
+        {(upiOverview?.counts?.review || 0) > 0 && activeTab !== "upi" && (
+          <div className="p-4 rounded-2xl bg-amber-50 border border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3 text-xs sm:text-sm text-amber-950">
+              <QrCode className="w-5 h-5 text-amber-700 shrink-0" />
+              <span>
+                <strong>{upiOverview?.counts?.review}</strong> UPI payment{(upiOverview?.counts?.review || 0) === 1 ? "" : "s"} awaiting 12-digit UTR verification.
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveTab("upi")}
+              className="px-4 py-2 rounded-xl bg-[#0B192C] hover:bg-slate-800 text-white text-xs font-label uppercase tracking-wider font-bold shrink-0"
+            >
+              Review UTR Queue →
+            </button>
+          </div>
+        )}
+
         {/* Primary Navigation Tabs */}
         <section className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
           <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100/90 rounded-2xl border border-slate-200/60 shadow-inner">
@@ -806,6 +865,27 @@ export default function AdminDashboardPage() {
               <span className="ml-1 px-1.5 py-0.2 bg-white/20 rounded-md text-[10px]">
                 {stats?.totalEnquiries ?? enquiries.length}
               </span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("upi")}
+              className={`px-4 py-2.5 rounded-xl font-label text-xs uppercase tracking-wider transition-all flex items-center gap-2 ${
+                activeTab === "upi"
+                  ? "bg-[#0B192C] text-white font-bold shadow-sm"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
+              }`}
+            >
+              <QrCode className="w-3.5 h-3.5 text-[#C8A84E]" />
+              <span>UPI Gateway</span>
+              {(upiOverview?.counts?.review || 0) > 0 ? (
+                <span className="ml-1 px-1.5 py-0.5 bg-amber-400 text-[#0B192C] font-bold rounded-md text-[10px]">
+                  {upiOverview?.counts?.review} Review
+                </span>
+              ) : (
+                <span className="ml-1 px-1.5 py-0.2 bg-white/20 rounded-md text-[10px]">
+                  {upiOverview?.counts?.paid ?? 0}
+                </span>
+              )}
             </button>
 
             <button
@@ -1529,6 +1609,15 @@ export default function AdminDashboardPage() {
         {/* ========================================================================= */}
         {/* TAB 5: RECORD MANUAL LEAD */}
         {/* ========================================================================= */}
+        {activeTab === "upi" && (
+          <AdminUpiGatewayPanel
+            overview={upiOverview}
+            loading={tabLoading}
+            getAdminHeaders={getAdminHeaders}
+            onReload={reloadUpiOverview}
+          />
+        )}
+
         {activeTab === "new-lead" && (
           <div className="max-w-2xl mx-auto bg-white border border-slate-200/80 rounded-3xl p-7 sm:p-9 shadow-soft-sm space-y-6 animate-in fade-in duration-200">
             <div>

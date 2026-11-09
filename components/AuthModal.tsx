@@ -9,7 +9,8 @@ import {
   User,
   ArrowRight,
   Key,
-  WarningCircle
+  WarningCircle,
+  CheckCircle
 } from "@phosphor-icons/react";
 
 export function AuthModal() {
@@ -20,6 +21,7 @@ export function AuthModal() {
     setAuthMode,
     signInEmail,
     signUpEmail,
+    resetPassword,
     signInGoogle
   } = useAuth();
 
@@ -27,9 +29,30 @@ export function AuthModal() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resettingPassword, setResettingPassword] = useState(false);
 
   if (!isAuthModalOpen) return null;
+
+  const handleForgotPassword = async () => {
+    setError("");
+    setSuccess("");
+    const cleanEmail = email.trim();
+    if (!cleanEmail || !cleanEmail.includes("@")) {
+      setError("Please enter your email address in the field above, then click 'Forgot password?'.");
+      return;
+    }
+    setResettingPassword(true);
+    try {
+      await resetPassword(cleanEmail);
+      setSuccess("Password reset instructions have been sent to your email. Please check your inbox and spam folder.");
+    } catch (err: any) {
+      setError(err?.message || "Failed to send password reset email.");
+    } finally {
+      setResettingPassword(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,6 +115,7 @@ export function AuthModal() {
             onClick={() => {
               setAuthMode("signin");
               setError("");
+              setSuccess("");
             }}
             className={`py-2 rounded-lg transition-all font-semibold ${
               authMode === "signin"
@@ -106,6 +130,7 @@ export function AuthModal() {
             onClick={() => {
               setAuthMode("signup");
               setError("");
+              setSuccess("");
             }}
             className={`py-2 rounded-lg transition-all font-semibold ${
               authMode === "signup"
@@ -121,6 +146,13 @@ export function AuthModal() {
           <div className="p-3 mb-4 rounded-xl bg-white border border-rose-300 text-rose-800 text-xs flex items-center gap-2">
             <WarningCircle className="w-4 h-4 shrink-0 text-rose-600" weight="bold" />
             <span>{error}</span>
+          </div>
+        )}
+
+        {success && (
+          <div className="p-3 mb-4 rounded-xl bg-white border border-emerald-300 text-emerald-800 text-xs flex items-center gap-2">
+            <CheckCircle className="w-4 h-4 shrink-0 text-emerald-600" weight="bold" />
+            <span>{success}</span>
           </div>
         )}
 
@@ -163,9 +195,21 @@ export function AuthModal() {
           </div>
 
           <div>
-            <label className="block caption-3 uppercase tracking-wider text-[#252923] font-semibold mb-1">
-              Password
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="caption-3 uppercase tracking-wider text-[#252923] font-semibold">
+                Password
+              </label>
+              {authMode === "signin" && (
+                <button
+                  type="button"
+                  disabled={resettingPassword || loading}
+                  onClick={handleForgotPassword}
+                  className="text-xs text-[#34483C] hover:text-[#252923] hover:underline font-medium transition-colors cursor-pointer"
+                >
+                  {resettingPassword ? "Sending link..." : "Forgot password?"}
+                </button>
+              )}
+            </div>
             <div className="relative">
               <Key className="w-4 h-4 text-[#252923]/50 absolute left-3.5 top-3" weight="bold" />
               <input
