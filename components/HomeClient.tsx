@@ -7,6 +7,7 @@ import { TaglineRevealSection } from "@/components/home/TaglineRevealSection";
 import { MentorStorySection } from "@/components/home/mentor/MentorStorySection";
 import { ProgramJourney } from "@/components/home/programs/ProgramJourney";
 import { CoreBeliefSection } from "@/components/home/belief/CoreBeliefSection";
+import { TestimonialsSection } from "@/components/home/testimonials/TestimonialsSection";
 import { FaqSection } from "@/components/home/faq/FaqSection";
 import { ClosingCtaSection } from "@/components/home/cta/ClosingCtaSection";
 
@@ -41,7 +42,12 @@ export default function HomeClient() {
       <CoreBeliefSection />
 
       {/* ========================================================================= */}
-      {/* F. FREQUENTLY ASKED QUESTIONS (Accordion in Ivory Mist & Stone Grey)      */}
+      {/* F. TESTIMONIALS (Student & Parent Voices in animated grid)               */}
+      {/* ========================================================================= */}
+      <TestimonialsSection />
+
+      {/* ========================================================================= */}
+      {/* G. FREQUENTLY ASKED QUESTIONS (Accordion in Ivory Mist & Stone Grey)      */}
       {/* ========================================================================= */}
       <FaqSection onBookCall={() => openOrientation("general")} />
 
