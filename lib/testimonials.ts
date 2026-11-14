@@ -24,7 +24,7 @@ export const testimonials: Testimonial[] = [
     track: "Mentee",
     image: "/testimonials/ansh-kumar.jpg",
     quote:
-      "Working with Officium Supremum was a turning point for my career. Instead of just giving me quick answers, they taught me how to break down complex problems and build a structured framework. Their calm clarity and targeted feedback helped me transition smoothly into a new role.\n\nFrom day one, Shivangi Ma'am created a safe and motivating space for me to learn. They listened to my half-formed ideas, asked thoughtful questions, and gave me the exact guidance I needed to tackle my goals with confidence.\n\nAn incredible mentor who truly cares about my growth. Their communication is clear, their advice is actionable, and they go out of their way to provide honest, constructive feedback. I wouldn't be where I am today without their support. Thank you so much!",
+      "Officium Supremum ke saath judna meri JEE ki taiyari ke liye ek turning point raha. Mujhe sirf quick answers nahi mile, balki yeh sikhaya gaya ki mushkil problems ko kaise todkar ek structured tareeke se solve kiya jaye. Unki calm clarity aur targeted feedback se meri padhai mein consistency aayi hai. Pehle din se hi Shivangi Ma'am ne ek aisa safe aur motivating mahaul diya jahan main apne adhoore ideas aur doubts bina jhijhak rakh sakta tha. Woh meri baat dhyan se sunti thi, soch-samajh kar sawal puchti thi, aur mujhe wahi guidance deti thi jo mujhe chahiye thi. Unki communication saaf hai, advice practical hoti hai, aur woh honest feedback dene se peeche nahi hatti. Thank you so much!",
   },
   {
     name: "Anubhav Dubey",
@@ -52,7 +52,7 @@ export const testimonials: Testimonial[] = [
     track: "Mentee",
     image: "/testimonials/prince-raj.jpg",
     quote:
-      "Being mentored by Himanshu Thakur Sir has been one of the best decisions of my preparation journey. He has not only guided me on what to study but also provided me with the right direction, a practical study plan, and the motivation to stay consistent with my goals.\n\nWhenever I feel confused or demotivated, his guidance helps me regain focus and move forward with confidence. His teaching style is easy to understand, and his support has made a huge difference in my preparation.\n\nWith his guidance, my NDA written exam went really well, and my preparation for the CBSE Board exams is also going smoothly. I can genuinely see improvement in my confidence, understanding, and approach towards studies.\n\nI would highly recommend Himanshu Thakur Sir to every student who is looking for genuine mentorship, proper guidance, and motivation to achieve their goals.",
+      "I joined Himanshu Sir's mentorship while preparing for the NDA and my Class 12 boards, and it gave my preparation a clear structure. Sir told me not just what to study, but how to plan each week and stay consistent with it. Whenever I felt confused or low on motivation, his guidance helped me refocus and get back on track. His way of explaining things is easy to understand, and it has made a real difference to my preparation. My NDA written exam went really well, and my CBSE board preparation is also going smoothly. I can see the improvement in my confidence, my understanding of concepts, and the way I approach studies.",
   },
   {
     name: "Ravi Shankar",
